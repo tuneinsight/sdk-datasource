@@ -15,8 +15,8 @@ type DataSourceFactory func(id models.DataSourceID, owner, name string, logger l
 
 // DataSource defines a GeCo data source, which is instantiated by a DataSourceFactory.
 type DataSource interface {
-	FromModel(*DataSourceBaseModel)
-	GetModel() *DataSourceBaseModel
+	FromModel(model *DataSourceModel)
+	GetModel() *DataSourceModel
 	SetID(id models.DataSourceID)
 	GetID() models.DataSourceID
 	GetOwner() string

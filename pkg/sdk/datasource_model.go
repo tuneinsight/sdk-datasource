@@ -6,8 +6,8 @@ import (
 	"gorm.io/gorm"
 )
 
-// DataSourceBaseModel is the underlying generic model that all data sources inherit, it is the model saved in the database.
-type DataSourceBaseModel struct {
+// DataSource is the underlying generic model that all data sources inherit, it is the model saved in the database.
+type DataSourceModel struct {
 	gorm.Model
 	ID        models.DataSourceID `gorm:"primaryKey"`
 	Name      string              `gorm:"uniqueIndex:udx_name;not null"`
@@ -16,9 +16,9 @@ type DataSourceBaseModel struct {
 	Owner     string              `gorm:"not null"`
 }
 
-// NewDataSourceBaseModel creates a new DataSourceBaseModel instance given required fields.
-func NewDataSourceBaseModel(id models.DataSourceID, owner, name string, dsType DataSourceType) *DataSourceBaseModel {
-	dsm := new(DataSourceBaseModel)
+// NewDataSourceModel creates a new DataSourceModel instance given required fields.
+func NewDataSourceModel(id models.DataSourceID, owner, name string, dsType DataSourceType) *DataSourceModel {
+	dsm := new(DataSourceModel)
 	if id == "" {
 		dsm.ID = NewDataSourceID()
 	} else {
@@ -31,7 +31,7 @@ func NewDataSourceBaseModel(id models.DataSourceID, owner, name string, dsType D
 }
 
 // BeforeCreate sets a new id to the data source if it is empty upon database insert.
-func (ds *DataSourceBaseModel) BeforeCreate(tx *gorm.DB) (err error) {
+func (ds *DataSourceModel) BeforeCreate(tx *gorm.DB) (err error) {
 	if ds.ID == "" {
 		ds.ID = NewDataSourceID()
 	}
@@ -39,47 +39,47 @@ func (ds *DataSourceBaseModel) BeforeCreate(tx *gorm.DB) (err error) {
 }
 
 // GetName returns the name of the datasource
-func (ds *DataSourceBaseModel) GetName() string {
+func (ds *DataSourceModel) GetName() string {
 	return ds.Name
 }
 
 // SetName sets the name of the datasource
-func (ds *DataSourceBaseModel) SetName(name string) {
+func (ds *DataSourceModel) SetName(name string) {
 	ds.Name = name
 }
 
 // GetType returns the type of the data source
-func (ds *DataSourceBaseModel) GetType() DataSourceType {
+func (ds *DataSourceModel) GetType() DataSourceType {
 	return ds.Type
 }
 
 // SetType sets the type of the data source
-func (ds *DataSourceBaseModel) SetType(t DataSourceType) {
+func (ds *DataSourceModel) SetType(t DataSourceType) {
 	ds.Type = t
 }
 
 // GetID Return the id of the DataSource.
-func (ds *DataSourceBaseModel) GetID() models.DataSourceID {
+func (ds *DataSourceModel) GetID() models.DataSourceID {
 	return ds.ID
 }
 
 // SetID sets the ID of the DataSource
-func (ds *DataSourceBaseModel) SetID(id models.DataSourceID) {
+func (ds *DataSourceModel) SetID(id models.DataSourceID) {
 	ds.ID = id
 }
 
 // GetModel returns the underlying DataSource
-func (ds *DataSourceBaseModel) GetModel() *DataSourceBaseModel {
+func (ds *DataSourceModel) GetModel() *DataSourceModel {
 	return ds
 }
 
 // SetModel sets the model of the data source
-func (ds *DataSourceBaseModel) SetModel(dsm *DataSourceBaseModel) {
+func (ds *DataSourceModel) SetModel(dsm *DataSourceModel) {
 	*ds = *dsm
 }
 
 // GetOwner returns the owner of the data source
-func (ds *DataSourceBaseModel) GetOwner() string {
+func (ds *DataSourceModel) GetOwner() string {
 	return ds.Owner
 }
 
