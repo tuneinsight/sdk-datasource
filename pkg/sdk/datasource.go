@@ -11,7 +11,7 @@ type DataSourceType string
 
 // DataSourceFactory defines a GeCo data source factory, which is a function that can instantiate a DataSource.
 // A data source plugin must expose a variable of this type and with the same name (i.e., "DataSourceFactory") for GeCo to load it.
-type DataSourceFactory func(id models.DataSourceID, owner, name string, logger logrus.FieldLogger, config map[string]interface{}) (ds DataSource, err error)
+type DataSourceFactory func(id models.DataSourceID, owner, name string) (ds DataSource, err error)
 
 // DataSource defines a GeCo data source, which is instantiated by a DataSourceFactory.
 type DataSource interface {
@@ -23,6 +23,10 @@ type DataSource interface {
 	GetData(query string) ([]string, [][]float64)
 	LoadData(columns []string, data interface{}) error
 	Data() map[string]interface{}
+	// Config configures the data source. It must be called after DataSourceFactory.
+	Config(logger logrus.FieldLogger, config map[string]interface{}) error
+	// ConfigFromDB configures the data source with the info stored in the DB. It must be called after DataSourceFactory if the data source has been retrieved from the DB.
+	ConfigFromDB(logger logrus.FieldLogger) error
 	// Query data source with a specific operation.
 	// "jsonParameters" and "jsonResults" are both serialized JSON payloads.
 	// "outputDataObjectsSharedIDs" maps output names of data object to their corresponding shared IDs.
