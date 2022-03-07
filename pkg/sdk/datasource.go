@@ -15,13 +15,10 @@ type DataSourceFactory func(id models.DataSourceID, owner, name string) (ds Data
 
 // DataSource defines a GeCo data source, which is instantiated by a DataSourceFactory.
 type DataSource interface {
-	FromModel(model *DataSourceModel)
 	GetModel() *DataSourceModel
 	SetID(id models.DataSourceID)
 	GetID() models.DataSourceID
 	GetOwner() string
-	GetData(query string) ([]string, [][]float64)
-	LoadData(columns []string, data interface{}) error
 	Data() map[string]interface{}
 	// Config configures the data source. It must be called after DataSourceFactory.
 	Config(logger logrus.FieldLogger, config map[string]interface{}) error
