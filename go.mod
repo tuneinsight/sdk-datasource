@@ -13,7 +13,6 @@ require (
 
 require (
 	github.com/asaskevich/govalidator v0.0.0-20210307081110-f21760c49a8d // indirect
-	github.com/creasty/defaults v1.5.2
 	github.com/go-openapi/analysis v0.21.1 // indirect
 	github.com/go-openapi/runtime v0.21.0 // indirect
 	github.com/go-stack/stack v1.8.1 // indirect
@@ -21,6 +20,7 @@ require (
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/mattn/go-sqlite3 v1.14.12
 	github.com/mitchellh/mapstructure v1.4.3 // indirect
+	github.com/stretchr/testify v1.7.0
 	go.mongodb.org/mongo-driver v1.8.2 // indirect
 	golang.org/x/net v0.0.0-20220111093109-d55c255bac03 // indirect
 	golang.org/x/sys v0.0.0-20211013075003-97ac67df715c // indirect

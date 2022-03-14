@@ -11,7 +11,7 @@ type DataSourceType string
 
 // DataSourceFactory defines a GeCo data source factory, which is a function that can instantiate a DataSource.
 // A data source plugin must expose a variable of this type and with the same name (i.e., "DataSourceFactory") for GeCo to load it.
-type DataSourceFactory func(id models.DataSourceID, owner, name string) (ds DataSource, err error)
+type DataSourceFactory func(id models.DataSourceID, owner, name string, dbManager *DBManager) (ds DataSource, err error)
 
 // DataSource defines a GeCo data source, which is instantiated by a DataSourceFactory.
 type DataSource interface {
