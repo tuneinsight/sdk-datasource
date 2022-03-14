@@ -73,4 +73,6 @@ func (conf PostgresConfig) Driver() driver.Driver {
 }
 
 // Name should return the name of the connected database
-func (conf PostgresConfig) Name() string
+func (conf PostgresConfig) Name() string {
+	return conf.Database
+}
