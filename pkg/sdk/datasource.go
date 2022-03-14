@@ -29,4 +29,6 @@ type DataSource interface {
 	// "outputDataObjectsSharedIDs" maps output names of data object to their corresponding shared IDs.
 	// "outputDataObjects" is a slice of data objects that were output by the query.
 	Query(userID string, operation string, jsonParameters []byte, outputDataObjectsSharedIDs map[OutputDataObjectName]models.DataObjectSharedID) (jsonResults []byte, outputDataObjects []DataObject, err error)
+	// Close is called to close all connections related to the datasource or other instances
+	Close() error
 }
