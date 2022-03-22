@@ -13,9 +13,10 @@ type DataObject struct {
 	// todo: the DataObjet defines at the moment an int value and an int vector,
 	// todo: but it should be integrated with the definition and implementation of the datamanager's DataObject to be generic
 
-	// the one not being used should be left to nil
+	// the ones not being used should be left to nil
 	IntValue  *int64
 	IntVector []int64
+	IntMatrix [][]int64
 }
 
 // OutputDataObjectName is a name for a data object that was output by a DataSourcePlugin.Query.
