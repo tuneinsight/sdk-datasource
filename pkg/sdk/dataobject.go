@@ -10,13 +10,17 @@ type DataObject struct {
 	// SharedID is the DataObjectSharedID that this DataObject should have.
 	SharedID models.DataObjectSharedID
 
-	// todo: the DataObjet defines at the moment an int value and an int vector,
-	// todo: but it should be integrated with the definition and implementation of the datamanager's DataObject to be generic
+	// TODO: the DataObjet defines at the moment int or float values, vectors or matrices,
+	// TODO: but it should be integrated with the definition and implementation of the datamanager's DataObject to be generic
 
 	// the ones not being used should be left to nil
 	IntValue  *int64
 	IntVector []int64
 	IntMatrix [][]int64
+
+	FloatValue  *float64
+	FloatVector []float64
+	FloatMatrix [][]float64
 }
 
 // OutputDataObjectName is a name for a data object that was output by a DataSourcePlugin.Query.
