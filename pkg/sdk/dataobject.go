@@ -21,6 +21,8 @@ type DataObject struct {
 	FloatValue  *float64
 	FloatVector []float64
 	FloatMatrix [][]float64
+
+	Columns []string
 }
 
 // OutputDataObjectName is a name for a data object that was output by a DataSourcePlugin.Query.
