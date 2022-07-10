@@ -27,7 +27,7 @@ type SQLiteConfig struct {
 	Directory string `yaml:"db-directory" default:"db/"`
 }
 
-// DriveName returns the name of the driver which is sqlite3
+// DriverName returns the name of the driver which is sqlite3
 func (conf SQLiteConfig) DriverName() string {
 	return "sqlite3"
 }
