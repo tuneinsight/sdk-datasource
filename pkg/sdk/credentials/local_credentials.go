@@ -7,6 +7,17 @@ type LocalCredentials struct {
 	credentials map[string]Credentials
 }
 
+// NewLocalCredentials returns a new instance of LocalCredentials initialized with @credentials.
+// @credentials are deep copied into the returned LocalCredentials instance.
+func NewLocalCredentials(credentials map[string]Credentials) *LocalCredentials {
+	localCred := new(LocalCredentials)
+	localCred.credentials = make(map[string]Credentials)
+	for k, v := range credentials {
+		localCred.credentials[k] = v
+	}
+	return localCred
+}
+
 // GetCredentials returns the credentials, stored in @localCred, identified by @credID.
 // If no credentials are stored under the provided @credID, it returns an error.
 func (localCred LocalCredentials) GetCredentials(credID string) (cred Credentials, err error) {

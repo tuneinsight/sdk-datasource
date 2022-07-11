@@ -3,6 +3,7 @@ package sdk
 import (
 	"github.com/sirupsen/logrus"
 	"github.com/tuneinsight/sdk-datasource/pkg/models"
+	"github.com/tuneinsight/sdk-datasource/pkg/sdk/credentials"
 )
 
 // DataSourceType defines a data source type, which uniquely identifies a data source plugin.
@@ -11,7 +12,7 @@ type DataSourceType string
 
 // DataSourceFactory defines a TI Note data source factory, which is a function that can instantiate a DataSource.
 // A data source plugin must expose a variable of this type and with the same name (i.e., "DataSourceFactory") for GeCo to load it.
-type DataSourceFactory func(id models.DataSourceID, owner, name string, dbManager *DBManager) (ds DataSource, err error)
+type DataSourceFactory func(id models.DataSourceID, owner, name string, credentialProvider credentials.Provider, dbManager *DBManager) (ds DataSource, err error)
 
 // DataSource defines a TI Note data source, which is instantiated by a DataSourceFactory.
 type DataSource interface {

@@ -8,6 +8,15 @@ type Credentials struct {
 	connectionString string
 }
 
+// NewCredentials returns a new instance of Credentials containing the passed parameters.
+func NewCredentials(username, password, connectionString string) *Credentials {
+	return &Credentials{
+		username:         username,
+		password:         password,
+		connectionString: connectionString,
+	}
+}
+
 // Username returns the username linked to a Credentials instance.
 // If no username is linked to the credentials, an empty string is returned.
 func (cred Credentials) Username() string {
