@@ -3,7 +3,6 @@ package sdk
 import (
 	"github.com/sirupsen/logrus"
 	"github.com/tuneinsight/sdk-datasource/pkg/models"
-	"github.com/tuneinsight/sdk-datasource/pkg/sdk/credentials"
 )
 
 // DataSourceType defines a data source type, which uniquely identifies a data source plugin.
@@ -11,24 +10,31 @@ import (
 type DataSourceType string
 
 // DataSourceFactory defines a TI Note data source factory, which is a function that can instantiate a DataSource.
-// A data source plugin must expose a variable of this type and with the same name (i.e., "DataSourceFactory") for GeCo to load it.
-type DataSourceFactory func(id models.DataSourceID, owner, name string, credentialProvider credentials.Provider, dbManager *DBManager) (ds DataSource, err error)
+// A data source plugin must expose a variable of this type and with the same name (i.e., "DataSourceFactory") for the TI Note to load it.
+type DataSourceFactory func(dsc *DataSourceCore, config map[string]interface{}, dbManager *DBManager) (ds DataSource, err error)
 
 // DataSource defines a TI Note data source, which is instantiated by a DataSourceFactory.
+// All DataSource implementations should embed DataSourceCore.
 type DataSource interface {
-	GetDatabaseModel() *DataSourceDatabaseModel
-	GetMetadata() map[string]interface{}
 	SetID(id models.DataSourceID)
 	GetID() models.DataSourceID
-	GetOwner() string
 
-	// Data returns all the data source data that must be stored in the TI Note object storage.
+	// GetDataSourceCore returns the DataSourceCore of the DataSource.
+	GetDataSourceCore() *DataSourceCore
+
+	// SetDataSourceConfig sets the DataSource configuration, i.e. DataSource specific  metadata not contained in DataSourceCore.
+	SetDataSourceConfig(map[string]interface{}) error
+	// GetDataSourceConfig returns the DataSource configuration, i.e. DataSource specific  metadata not contained in DataSourceCore.
+	GetDataSourceConfig() map[string]interface{}
+
+	// Data must return all the DataSource data to be stored in the TI Note object storage.
+	// Implementations should just call the DataImpl() function provided by the package.
 	Data() map[string]interface{}
 
-	// Config configures the data source. It must be called after DataSourceFactory.
+	// Config configures the DataSource. It must be called after DataSourceFactory.
 	Config(logger logrus.FieldLogger, config map[string]interface{}) error
 
-	// ConfigFromDB configures the data source with the info stored in the DB. It must be called after DataSourceFactory if the data source has been retrieved from the DB.
+	// ConfigFromDB configures the DataSource with the info stored in the DB. It must be called after DataSourceFactory if the DataSource has been retrieved from the DB.
 	ConfigFromDB(logger logrus.FieldLogger) error
 
 	// Query data source with a specific operation.
@@ -37,6 +43,6 @@ type DataSource interface {
 	// "outputDataObjects" is a slice of data objects that were output by the query.
 	Query(userID string, operation string, jsonParameters []byte, outputDataObjectsSharedIDs map[OutputDataObjectName]models.DataObjectSharedID) (jsonResults []byte, outputDataObjects []DataObject, err error)
 
-	// Close is called to close all connections related to the datasource or other instances
+	// Close is called to close all connections related to the DataSource or other instances.
 	Close() error
 }
