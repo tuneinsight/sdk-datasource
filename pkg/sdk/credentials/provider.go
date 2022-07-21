@@ -11,10 +11,11 @@ type Provider interface {
 	// Type returns the Provider type.
 	Type() ProviderType
 	// GetCredentials returns the Credentials identified by @credID.
-	GetCredentials(credID string) (Credentials, error)
+	GetCredentials(credID string) (*Credentials, error)
 }
 
 // ProviderFactories contains the ProviderFactory for the implemented Provider s.
 var ProviderFactories = map[ProviderType]ProviderFactory{
-	LocalProviderType: LocalFactory,
+	LocalProviderType:         LocalFactory,
+	AzureKeyVaultProviderType: AzureKeyVaultFactory,
 }

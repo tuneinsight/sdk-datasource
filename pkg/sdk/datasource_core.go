@@ -84,6 +84,7 @@ func NewMetadataStorage(cp credentials.Provider) *MetadataStorage {
 }
 
 const (
+	// DSCoreMetadataField is the key under which the MetadataStorage are stored in the TI Note storage.
 	DSCoreMetadataField = "ds-core-metadata"
 )
 
