@@ -7,130 +7,125 @@ import (
 	"gorm.io/gorm"
 )
 
-// DataSourceCore is the base struct that all data source implementations must embed.
+// DataSourceCore contains the common DataSource metadata.
+// All DataSource implementations must embed DataSourceCore.
 type DataSourceCore struct {
-	*DataSourceDatabaseModel
-	*DataSourceMetadata
+	*MetadataDB
+	*MetadataStorage
 }
 
-// DataSourceDatabaseModel contains the data source information that are stored in the TI Note database.
-type DataSourceDatabaseModel struct {
+// MetadataDB contains the common DataSource metadata that are stored in the TI Note database.
+type MetadataDB struct {
 	gorm.Model
-	ID        models.DataSourceID `gorm:"primaryKey"`
-	Name      string              `gorm:"uniqueIndex:udx_name;not null"`
-	DeletedAt gorm.DeletedAt      `gorm:"uniqueIndex:udx_name"`
-	Type      DataSourceType      `gorm:"not null"`
-	Owner     string              `gorm:"not null"`
+	ID                      models.DataSourceID      `gorm:"primaryKey"`
+	Name                    string                   `gorm:"uniqueIndex:udx_name;not null"`
+	Type                    DataSourceType           `gorm:"not null"`
+	CredentialsProviderType credentials.ProviderType `gorm:"not null"`
+	Owner                   string                   `gorm:"not null"`
+	DeletedAt               gorm.DeletedAt           `gorm:"uniqueIndex:udx_name"`
 }
 
-// DataSourceMetadata contains data source metadata fields that are stored in the TI Note object storage.
-type DataSourceMetadata struct {
+// MetadataStorage contains the common DataSource metadata that are stored in the TI Note object storage.
+type MetadataStorage struct {
 	CredentialsProvider credentials.Provider
 	Attributes          []string
 	ConsentType         models.DataSourceConsentType
 }
 
-// NewDataSourceCore instantiates a DataSourceCore with default DataSourceMetadata, given the original DataSourceDatabaseModel.
-func NewDataSourceCore(model *DataSourceDatabaseModel) *DataSourceCore {
+// NewDataSourceCore instantiates a DataSourceCore with the provided @mdb and @mds.
+// If either @mdb or @mds are nil, they are set to default values.
+func NewDataSourceCore(mdb *MetadataDB, mds *MetadataStorage) *DataSourceCore {
 	dsc := new(DataSourceCore)
-	dsc.DataSourceDatabaseModel = new(DataSourceDatabaseModel)
-	if model != nil {
-		dsc.DataSourceDatabaseModel = model
+
+	if mds != nil {
+		dsc.MetadataStorage = mds
+	} else {
+		dsc.MetadataStorage = NewMetadataStorage(nil)
 	}
-	dsc.DataSourceMetadata = NewDataSourceMetadata()
+
+	if mdb != nil {
+		dsc.MetadataDB = mdb
+		// override any previously existing credentials provider type with the right one
+		dsc.MetadataDB.CredentialsProviderType = dsc.MetadataStorage.CredentialsProvider.Type()
+	} else {
+		dsc.MetadataDB = NewMetadataDB("", "", "", "", dsc.MetadataStorage.CredentialsProvider.Type())
+	}
+
 	return dsc
 }
 
-// NewDataSourceDatabaseModel instantiates a DataSourceDatabaseModel given the required fields.
-func NewDataSourceDatabaseModel(id models.DataSourceID, owner, name string, dsType DataSourceType) *DataSourceDatabaseModel {
-	dsm := new(DataSourceDatabaseModel)
+// NewMetadataDB instantiates a MetadataDB given the required fields.
+func NewMetadataDB(id models.DataSourceID, owner, name string, dsType DataSourceType, cpType credentials.ProviderType) *MetadataDB {
+	mdb := new(MetadataDB)
 	if id == "" {
-		dsm.ID = NewDataSourceID()
+		mdb.ID = newDataSourceID()
 	} else {
-		dsm.ID = id
+		mdb.ID = id
 	}
-	dsm.Type = dsType
-	dsm.Owner = owner
-	dsm.Name = name
-	return dsm
+	mdb.Type = dsType
+	mdb.Owner = owner
+	mdb.Name = name
+	mdb.CredentialsProviderType = cpType
+	return mdb
 }
 
-// NewDataSourceMetadata instantiates a default DataSourceMetadata.
-func NewDataSourceMetadata() *DataSourceMetadata {
-	meta := new(DataSourceMetadata)
-	meta.Attributes = make([]string, 0)
-	meta.ConsentType = models.DataSourceConsentTypeUnknown
-	return meta
+// NewMetadataStorage instantiates a default MetadataStorage.
+// If a nil @cp is passed, a default Local one is set.
+func NewMetadataStorage(cp credentials.Provider) *MetadataStorage {
+	ms := new(MetadataStorage)
+	ms.Attributes = make([]string, 0)
+	ms.ConsentType = models.DataSourceConsentTypeUnknown
+	if cp != nil {
+		ms.CredentialsProvider = cp
+	} else {
+		ms.CredentialsProvider = credentials.NewLocal(nil)
+	}
+	return ms
 }
 
 const (
-	dsDSMetadataField = "ds-ti-note-metadata"
+	// DSCoreMetadataField is the key under which the MetadataStorage are stored in the TI Note storage.
+	DSCoreMetadataField = "ds-core-metadata"
 )
 
-// GetMetadata returns the data source metadata.
-func (ds *DataSourceCore) GetMetadata() map[string]interface{} {
-	return map[string]interface{}{dsDSMetadataField: ds.DataSourceMetadata}
+// GetDataSourceCore returns the DataSourceCore of the data source.
+func (dsc *DataSourceCore) GetDataSourceCore() *DataSourceCore {
+	return dsc
 }
 
-// Data returns all the data source data that must be stored in the TI Note object storage.
-func (ds *DataSourceCore) Data() map[string]interface{} {
-	return ds.GetMetadata()
-}
-
-// BeforeCreate sets a new id to the data source if it is empty upon database insert.
-func (ds *DataSourceDatabaseModel) BeforeCreate(tx *gorm.DB) (err error) {
-	if ds.ID == "" {
-		ds.ID = NewDataSourceID()
+// BeforeCreate sets a new id to the DataSource if it is empty upon database insert.
+func (mdb *MetadataDB) BeforeCreate(tx *gorm.DB) (err error) {
+	if mdb.ID == "" {
+		mdb.ID = newDataSourceID()
 	}
 	return
 }
 
-// GetName returns the name of the data source.
-func (ds *DataSourceDatabaseModel) GetName() string {
-	return ds.Name
-}
-
-// SetName sets the name of the data source.
-func (ds *DataSourceDatabaseModel) SetName(name string) {
-	ds.Name = name
-}
-
-// GetType returns the type of the data source.
-func (ds *DataSourceDatabaseModel) GetType() DataSourceType {
-	return ds.Type
-}
-
-// SetType sets the type of the data source.
-func (ds *DataSourceDatabaseModel) SetType(t DataSourceType) {
-	ds.Type = t
-}
-
 // GetID Return the id of the DataSource.
-func (ds *DataSourceDatabaseModel) GetID() models.DataSourceID {
-	return ds.ID
+func (mdb *MetadataDB) GetID() models.DataSourceID {
+	return mdb.ID
 }
 
 // SetID sets the ID of the DataSource.
-func (ds *DataSourceDatabaseModel) SetID(id models.DataSourceID) {
-	ds.ID = id
+func (mdb *MetadataDB) SetID(id models.DataSourceID) {
+	mdb.ID = id
 }
 
-// GetDatabaseModel returns the underlying DataSource.
-func (ds *DataSourceDatabaseModel) GetDatabaseModel() *DataSourceDatabaseModel {
-	return ds
+// Data returns MetadataStorage in the format expected by the TI Node to store it in storage.
+func (ms *MetadataStorage) Data() map[string]interface{} {
+	return map[string]interface{}{DSCoreMetadataField: ms}
 }
 
-// SetModel sets the model of the data source.
-func (ds *DataSourceDatabaseModel) SetModel(dsm *DataSourceDatabaseModel) {
-	*ds = *dsm
+// DataImpl is the function that should be called by all Data() implementations.
+func DataImpl(ds DataSource) map[string]interface{} {
+	data := map[string]interface{}{DSCoreMetadataField: ds.GetDataSourceCore().MetadataStorage}
+	for k, v := range ds.GetDataSourceConfig() {
+		data[k] = v
+	}
+	return data
 }
 
-// GetOwner returns the owner of the data source.
-func (ds *DataSourceDatabaseModel) GetOwner() string {
-	return ds.Owner
-}
-
-// NewDataSourceID generates a new data source ID.
-func NewDataSourceID() models.DataSourceID {
+// newDataSourceID generates a new DataSource ID.
+func newDataSourceID() models.DataSourceID {
 	return models.DataSourceID(uuid.New().String())
 }
