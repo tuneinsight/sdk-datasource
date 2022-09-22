@@ -4,6 +4,7 @@ import (
 	"database/sql/driver"
 	"fmt"
 
+	"github.com/go-sql-driver/mysql"
 	"github.com/lib/pq"
 	"github.com/mattn/go-sqlite3"
 )
@@ -74,5 +75,34 @@ func (conf PostgresConfig) Driver() driver.Driver {
 
 // Name should return the name of the connected database
 func (conf PostgresConfig) Name() string {
+	return conf.Database
+}
+
+// MySQLConfig is the configuration when using the MySQL driver
+type MySQLConfig struct {
+	Host     string `yaml:"db-host" default:"localhost"`
+	Port     int    `yaml:"db-port" default:"5432"`
+	Database string `yaml:"db-database" default:"test"`
+	User     string `yaml:"db-user" default:"user"`
+	Password string `yaml:"db-pwd" default:"password"`
+}
+
+// DriverName returns "mysql"
+func (conf MySQLConfig) DriverName() string {
+	return "mysql"
+}
+
+// DataSourceName returns the connection string to a MySQL db
+func (conf MySQLConfig) DataSourceName() string {
+	return fmt.Sprintf("%s:%s@tcp(%s:%d)/%s", conf.User, conf.Password, conf.Host, conf.Port, conf.Database)
+}
+
+// Driver Should returns the MySQL database driver
+func (conf MySQLConfig) Driver() driver.Driver {
+	return mysql.MySQLDriver{}
+}
+
+// Name should return the name of the connected database
+func (conf MySQLConfig) Name() string {
 	return conf.Database
 }
