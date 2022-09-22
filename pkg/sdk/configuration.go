@@ -51,7 +51,7 @@ func (conf SQLiteConfig) Name() string {
 }
 
 // SetCredentials just implements and does nothing as there are no credentials associated with this configuration
-func (conf SQLiteConfig) SetCredentials(user, password string) {
+func (conf *SQLiteConfig) SetCredentials(user, password string) {
 	return
 }
 
@@ -86,7 +86,7 @@ func (conf PostgresConfig) Name() string {
 }
 
 // SetCredentials sets the user and password field of the configuration
-func (conf PostgresConfig) SetCredentials(user, password string) {
+func (conf *PostgresConfig) SetCredentials(user, password string) {
 	conf.User = user
 	conf.Password = password
 }
@@ -121,7 +121,7 @@ func (conf MySQLConfig) Name() string {
 }
 
 // SetCredentials sets the user and password field of the configuration
-func (conf MySQLConfig) SetCredentials(user, password string) {
+func (conf *MySQLConfig) SetCredentials(user, password string) {
 	conf.User = user
 	conf.Password = password
 }

@@ -31,7 +31,7 @@ func TestSQLite(t *testing.T) {
 		Database:  "test",
 	}
 
-	db, err := manager.NewDatabase(dbConf)
+	db, err := manager.NewDatabase(&dbConf)
 	require.NoError(t, err)
 	_, err = db.Exec(createQuery)
 	require.NoError(t, err)
