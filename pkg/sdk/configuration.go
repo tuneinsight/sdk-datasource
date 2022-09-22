@@ -20,6 +20,8 @@ type DatabaseConfig interface {
 	Driver() driver.Driver
 	// Name should return the name of the connected database
 	Name() string
+	// SetCredentials should set the credentials on the given configuration
+	SetCredentials(user, password string)
 }
 
 // SQLiteConfig is the configuration when using the sqlite driver
@@ -46,6 +48,11 @@ func (conf SQLiteConfig) Driver() driver.Driver {
 // Name returns the name of the connected database
 func (conf SQLiteConfig) Name() string {
 	return conf.Database
+}
+
+// SetCredentials just implements and does nothing as there are no credentials associated with this configuration
+func (conf SQLiteConfig) SetCredentials(user, password string) {
+	return
 }
 
 // PostgresConfig is the configuration when using the postgres driver
@@ -78,6 +85,12 @@ func (conf PostgresConfig) Name() string {
 	return conf.Database
 }
 
+// SetCredentials sets the user and password field of the configuration
+func (conf PostgresConfig) SetCredentials(user, password string) {
+	conf.User = user
+	conf.Password = password
+}
+
 // MySQLConfig is the configuration when using the MySQL driver
 type MySQLConfig struct {
 	Host     string `yaml:"db-host" default:"localhost"`
@@ -105,4 +118,10 @@ func (conf MySQLConfig) Driver() driver.Driver {
 // Name should return the name of the connected database
 func (conf MySQLConfig) Name() string {
 	return conf.Database
+}
+
+// SetCredentials sets the user and password field of the configuration
+func (conf MySQLConfig) SetCredentials(user, password string) {
+	conf.User = user
+	conf.Password = password
 }
