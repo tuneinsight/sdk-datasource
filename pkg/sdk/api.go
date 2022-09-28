@@ -6,11 +6,10 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-// API is composed of a *sql.DB, logger and API configuration
+// API is composed of the a logger and API configuration
 type API struct {
 	APIConfig
 	logrus.FieldLogger
-	MaxConnectionAttempts       int
 	SleepingTimeBetweenAttempts time.Duration
 }
 
