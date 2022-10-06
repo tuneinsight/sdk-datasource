@@ -26,9 +26,8 @@ func (conf MISPAPIConfig) GetURL() string {
 
 // GenericAPIConfig is the configuration for a generic HTTP API
 type GenericAPIConfig struct {
-	URL      string `yaml,json:"api-url" default:"localhost"`
-	User     string `yaml,json:"api-user" default:""`
-	Password string `yaml,json:"api-pwd" default:""`
+	URL   string `yaml,json:"api-url" default:"localhost"`
+	Token string `yaml,json:"api-token" default:""`
 }
 
 // APIName returns the name of the driver which is 'generic'

@@ -55,6 +55,8 @@ func NewDataSourceCore(mdb *MetadataDB, mds *MetadataStorage) *DataSourceCore {
 }
 
 // NewMetadataDB instantiates a MetadataDB given the required fields.
+//
+// cpType is the credential provider type (e.g. localCredentialsProvider)
 func NewMetadataDB(id models.DataSourceID, owner, name string, dsType DataSourceType, cpType credentials.ProviderType) *MetadataDB {
 	mdb := new(MetadataDB)
 	if id == "" {
