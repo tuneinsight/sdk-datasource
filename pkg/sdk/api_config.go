@@ -14,7 +14,7 @@ type MISPAPIConfig struct {
 	Token string `yaml,json:"api-token" default:""`
 }
 
-// APIName returns the name of the driver which is 'misp'
+// APIName returns the name of the API which is 'misp'
 func (conf MISPAPIConfig) APIName() string {
 	return "misp"
 }
@@ -30,7 +30,7 @@ type GenericAPIConfig struct {
 	Token string `yaml,json:"api-token" default:""`
 }
 
-// APIName returns the name of the driver which is 'generic'
+// APIName returns the name of the API which is 'generic'
 func (conf GenericAPIConfig) APIName() string {
 	return "generic"
 }
