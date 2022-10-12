@@ -8,22 +8,6 @@ type APIConfig interface {
 	GetURL() string
 }
 
-// MISPAPIConfig is the configuration for the MISP HTTP API
-type MISPAPIConfig struct {
-	URL   string `yaml:"api-url" json:"api-url" default:"localhost"`
-	Token string `yaml:"api-token" json:"api-token" default:""`
-}
-
-// APIName returns the name of the API which is 'misp'
-func (conf MISPAPIConfig) APIName() string {
-	return "misp"
-}
-
-// GetURL returns the url in configuration
-func (conf MISPAPIConfig) GetURL() string {
-	return conf.URL
-}
-
 // GenericAPIConfig is the configuration for a generic HTTP API
 type GenericAPIConfig struct {
 	URL   string `yaml:"api-url" json:"api-url" default:"localhost"`
