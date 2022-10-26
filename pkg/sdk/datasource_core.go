@@ -25,6 +25,10 @@ type MetadataDB struct {
 	DeletedAt               gorm.DeletedAt           `gorm:"uniqueIndex:udx_name"`
 }
 
+func (MetadataDB) TableName() string {
+	return "data_sources"
+}
+
 // MetadataStorage contains the common DataSource metadata that are stored in the TI Note object storage.
 type MetadataStorage struct {
 	CredentialsProvider credentials.Provider

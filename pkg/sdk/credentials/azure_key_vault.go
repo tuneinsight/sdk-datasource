@@ -102,7 +102,7 @@ func (akv AzureKeyVault) Type() ProviderType {
 func (akv AzureKeyVault) GetCredentials(credID string) (*Credentials, error) {
 
 	if id, ok := akv.credsMapping[credID]; ok {
-		logrus.Infof("using mapped id -> %s: %s", credID, id)
+		logrus.Infof("using credentials mapped id -> %s: %s", credID, id)
 		credID = id
 	}
 
