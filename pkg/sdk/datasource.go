@@ -1,6 +1,8 @@
 package sdk
 
 import (
+	"context"
+
 	"github.com/sirupsen/logrus"
 	"github.com/tuneinsight/sdk-datasource/pkg/models"
 )
@@ -18,6 +20,9 @@ type DataSourceFactory func(dsc *DataSourceCore, config map[string]interface{}, 
 type DataSource interface {
 	SetID(id models.DataSourceID)
 	GetID() models.DataSourceID
+
+	SetContext(ctx *context.Context)
+	GetContext() *context.Context
 
 	// GetDataSourceCore returns the DataSourceCore of the DataSource.
 	GetDataSourceCore() *DataSourceCore
