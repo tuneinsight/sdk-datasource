@@ -14,7 +14,7 @@ import (
 type DataSourceCore struct {
 	*MetadataDB
 	*MetadataStorage
-	Ctx *context.Context
+	Ctx *context.Context // For telemetry
 }
 
 // MetadataDB contains the common DataSource metadata that are stored in the TI Note database.
