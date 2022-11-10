@@ -30,6 +30,14 @@ func StartSpan(ctx *context.Context, tracerName string, name string, opts ...tra
 
 	newCtx, span := tr.Start(*ctx, name, opts...)
 	span.SetAttributes(attribute.Key("function").String(GetCallerFuncName()))
+
+	// Add memory usage
+	var m runtime.MemStats
+	runtime.ReadMemStats(&m)
+	span.SetAttributes(attribute.Key("m.Alloc").Int64(int64(m.Alloc)))
+	span.SetAttributes(attribute.Key("m.TotalAlloc").Int64(int64(m.TotalAlloc)))
+	span.SetAttributes(attribute.Key("m.NumGC").Int64(int64(m.NumGC)))
+
 	*ctx = newCtx
 	return span
 }
