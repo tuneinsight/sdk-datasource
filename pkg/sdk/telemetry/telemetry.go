@@ -3,6 +3,7 @@ package telemetry
 import (
 	"context"
 	"runtime"
+	"sync"
 
 	"github.com/sirupsen/logrus"
 	"go.opentelemetry.io/otel"
@@ -10,6 +11,8 @@ import (
 	"go.opentelemetry.io/otel/propagation"
 	"go.opentelemetry.io/otel/trace"
 )
+
+var mut sync.Mutex
 
 // StartSpan creates a new Open Telemetry tracer and starts a span with the given name and returns it.
 // the context is updated with the new span.
@@ -22,6 +25,9 @@ func StartSpan(ctx *context.Context, tracerName string, name string, opts ...tra
 	if tr == nil {
 		logrus.Warn("otel tracer not set")
 	}
+
+	mut.Lock()
+	defer mut.Unlock()
 
 	if ctx == nil {
 		newBackCtx := context.Background()
@@ -45,11 +51,18 @@ func StartSpan(ctx *context.Context, tracerName string, name string, opts ...tra
 // ReInjectContext carries the trace context in a new background context
 func ReInjectContext(ctx *context.Context) {
 	// carrying the trace context in a new background context
+	newCtx := CarryTelemetryContext(*ctx)
+	*ctx = newCtx
+}
+
+// CarryTelemetryContext carries the trace context in a new background context
+func CarryTelemetryContext(ctx context.Context) context.Context {
+	// carrying the trace context in a new background context
 	carrier := propagation.MapCarrier{}
 	traceContext := propagation.TraceContext{}
-	traceContext.Inject(*ctx, carrier)
+	traceContext.Inject(ctx, carrier)
 	newCtx := traceContext.Extract(context.Background(), carrier)
-	*ctx = newCtx
+	return newCtx
 }
 
 // GetCallerFuncName returns the name of the function 2 levels higher in the stack.
