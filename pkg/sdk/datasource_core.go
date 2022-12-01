@@ -1,6 +1,8 @@
 package sdk
 
 import (
+	"context"
+
 	"github.com/google/uuid"
 	"github.com/tuneinsight/sdk-datasource/pkg/models"
 	"github.com/tuneinsight/sdk-datasource/pkg/sdk/credentials"
@@ -12,6 +14,7 @@ import (
 type DataSourceCore struct {
 	*MetadataDB
 	*MetadataStorage
+	Ctx *context.Context // For telemetry
 }
 
 // MetadataDB contains the common DataSource metadata that are stored in the TI Note database.
