@@ -98,6 +98,16 @@ func (dsc *DataSourceCore) GetDataSourceCore() *DataSourceCore {
 	return dsc
 }
 
+// SetContext sets a context of the data source
+func (dsc *DataSourceCore) SetContext(ctx *context.Context) {
+	dsc.Ctx = ctx
+}
+
+// GetContext return of context of the data source
+func (dsc *DataSourceCore) GetContext() *context.Context {
+	return dsc.Ctx
+}
+
 // BeforeCreate sets a new id to the DataSource if it is empty upon database insert.
 func (mdb *MetadataDB) BeforeCreate(tx *gorm.DB) (err error) {
 	if mdb.ID == "" {
