@@ -30,7 +30,7 @@ type MetadataDB struct {
 
 // TableName overrides the table name used by MetadataDB to `data_sources`
 func (MetadataDB) TableName() string {
-	return "datamanager.data_sources"
+	return "data_sources"
 }
 
 // MetadataStorage contains the common DataSource metadata that are stored in the TI Note object storage.
