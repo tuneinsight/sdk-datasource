@@ -27,3 +27,12 @@ go-lint:
 		exit 1; \
 		fi \
 	}
+
+## Use docker mounting the current directory to /
+GO_SWAGGER ?= docker run --platform linux/amd64 --rm -u "$(USER_GROUP)" -v "$(CURDIR)":/ -w / quay.io/goswagger/swagger:v0.25.0
+
+go-swagger-gen: ## Generate go model code from swagger spec
+	$(GO_SWAGGER) -q generate model \
+		--accept-definitions-only \
+		--target=./pkg/ \
+		--spec=./swagger.yml
