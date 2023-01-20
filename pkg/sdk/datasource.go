@@ -15,6 +15,11 @@ type DataSourceType string
 // A data source plugin must expose a variable of this type and with the same name (i.e., "DataSourceFactory") for the TI Note to load it.
 type DataSourceFactory func(dsc *DataSourceCore, config map[string]interface{}, dbManager *DBManager) (ds DataSource, err error)
 
+const (
+	// DefaultResultKey is the default key of the results returned by `Query`.
+	DefaultResultKey string = "default"
+)
+
 // DataSource defines a TI Note data source, which is instantiated by a DataSourceFactory.
 // All DataSource implementations should embed DataSourceCore.
 type DataSource interface {
