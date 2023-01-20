@@ -42,11 +42,12 @@ type DataSource interface {
 	// ConfigFromDB configures the DataSource with the info stored in the DB. It must be called after DataSourceFactory if the DataSource has been retrieved from the DB.
 	ConfigFromDB(logger logrus.FieldLogger) error
 
-	// Query data source with a specific operation.
-	// "jsonParameters" and "jsonResults" are both serialized JSON payloads.
-	// "outputDataObjectsSharedIDs" maps output names of data object to their corresponding shared IDs.
-	// "outputDataObjects" is a slice of data objects that were output by the query.
-	Query(userID string, operation string, jsonParameters []byte, outputDataObjectsSharedIDs map[OutputDataObjectName]models.DataObjectSharedID) (jsonResults []byte, outputDataObjects []DataObject, err error)
+	// Query data source with a specific operation. (the possible operations are defined by the data source)
+	//  - userID is the ID of the user who is querying the data source (e.g. the username)
+	//  - params are the query parameters. Typically two keys are "operation" for the type of operation
+	// 	  and "params" for serialized JSON payloads.
+	//  - resultKeys are the keys of the results to be returned. If empty, the default key is "default"
+	Query(userID string, params map[string]interface{}, resultKeys ...string) (results map[string]interface{}, err error)
 
 	// Close is called to close all connections related to the DataSource or other instances.
 	Close() error

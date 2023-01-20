@@ -108,7 +108,7 @@ func (akv AzureKeyVault) GetCredentials(credID string) (*Credentials, error) {
 
 	resp, err := akv.client.GetSecret(context.TODO(), credID, "", nil)
 	if err != nil {
-		return nil, fmt.Errorf("while retrieving credentials with ID: %s from azure key vault: %s", credID, os.Getenv("AZURE_KEY_VAULT_URI"))
+		return nil, fmt.Errorf("while retrieving credentials with ID: %s from azure key vault: %s, %w", credID, os.Getenv("AZURE_KEY_VAULT_URI"), err)
 	}
 
 	credsJSON := *resp.Value
