@@ -9,9 +9,7 @@ import (
 
 	"github.com/sirupsen/logrus"
 
-	"github.com/Azure/azure-sdk-for-go/sdk/azcore"
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/policy"
-
 	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
 	"github.com/Azure/azure-sdk-for-go/sdk/keyvault/azsecrets"
 )
@@ -64,22 +62,27 @@ func NewAzureKeyVault(credsMapping map[string]string) (*AzureKeyVault, error) {
 	}
 
 	// exponential backoff options
-	clientOptions := &azcore.ClientOptions{
-		Retry: policy.RetryOptions{
-			RetryDelay:    2 * time.Second,
-			MaxRetryDelay: 16 * time.Second,
-			MaxRetries:    5,
+	clientOptions := &azsecrets.ClientOptions{
+		ClientOptions: policy.ClientOptions{
+			Retry: policy.RetryOptions{
+				RetryDelay:    2 * time.Second,
+				MaxRetryDelay: 16 * time.Second,
+				MaxRetries:    5,
+			},
 		},
 	}
 	// create a Key Vault client
-	azureKeyVault.client = azsecrets.NewClient(keyVaultURI, cred, clientOptions)
+	azureKeyVault.client, err = azsecrets.NewClient(keyVaultURI, cred, clientOptions)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create a key vault client: %v", err)
+	}
 
 	azureKeyVault.credsMapping = credsMapping
 
 	return azureKeyVault, nil
 }
 
-// AzureKeyVaultFactory is the ProviderFactory for AzureKeyVault. It aceepts the same arguments as AzureKeyVault.
+// AzureKeyVaultFactory is the ProviderFactory for AzureKeyVault. It accepts the same arguments as AzureKeyVault.
 func AzureKeyVaultFactory(args ...interface{}) (Provider, error) {
 	if args == nil {
 		return NewAzureKeyVault(nil)
