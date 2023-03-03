@@ -64,15 +64,21 @@ func NewAzureKeyVault(credsMapping map[string]string) (*AzureKeyVault, error) {
 	}
 
 	// exponential backoff options
-	clientOptions := &azcore.ClientOptions{
-		Retry: policy.RetryOptions{
-			RetryDelay:    2 * time.Second,
-			MaxRetryDelay: 16 * time.Second,
-			MaxRetries:    5,
+	clientOptions := &azsecrets.ClientOptions{
+		ClientOptions: azcore.ClientOptions{
+			Retry: policy.RetryOptions{
+				RetryDelay:    2 * time.Second,
+				MaxRetryDelay: 16 * time.Second,
+				MaxRetries:    5,
+			},
 		},
 	}
+
 	// create a Key Vault client
-	azureKeyVault.client = azsecrets.NewClient(keyVaultURI, cred, clientOptions)
+	azureKeyVault.client, err = azsecrets.NewClient(keyVaultURI, cred, clientOptions)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create a client: %v", err)
+	}
 
 	azureKeyVault.credsMapping = credsMapping
 
