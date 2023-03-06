@@ -9,6 +9,7 @@ import (
 
 	"github.com/sirupsen/logrus"
 
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore"
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/policy"
 	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
 	"github.com/Azure/azure-sdk-for-go/sdk/keyvault/azsecrets"
@@ -63,7 +64,7 @@ func NewAzureKeyVault(credsMapping map[string]string) (*AzureKeyVault, error) {
 
 	// exponential backoff options
 	clientOptions := &azsecrets.ClientOptions{
-		ClientOptions: policy.ClientOptions{
+		ClientOptions: azcore.ClientOptions{
 			Retry: policy.RetryOptions{
 				RetryDelay:    2 * time.Second,
 				MaxRetryDelay: 16 * time.Second,
@@ -71,6 +72,7 @@ func NewAzureKeyVault(credsMapping map[string]string) (*AzureKeyVault, error) {
 			},
 		},
 	}
+
 	// create a Key Vault client
 	azureKeyVault.client, err = azsecrets.NewClient(keyVaultURI, cred, clientOptions)
 	if err != nil {
