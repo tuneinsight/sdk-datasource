@@ -11,7 +11,6 @@ import (
 
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore"
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/policy"
-
 	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
 	"github.com/Azure/azure-sdk-for-go/sdk/keyvault/azsecrets"
 )
@@ -77,7 +76,7 @@ func NewAzureKeyVault(credsMapping map[string]string) (*AzureKeyVault, error) {
 	// create a Key Vault client
 	azureKeyVault.client, err = azsecrets.NewClient(keyVaultURI, cred, clientOptions)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create a client: %v", err)
+		return nil, fmt.Errorf("failed to create a key vault client: %v", err)
 	}
 
 	azureKeyVault.credsMapping = credsMapping
@@ -85,7 +84,7 @@ func NewAzureKeyVault(credsMapping map[string]string) (*AzureKeyVault, error) {
 	return azureKeyVault, nil
 }
 
-// AzureKeyVaultFactory is the ProviderFactory for AzureKeyVault. It aceepts the same arguments as AzureKeyVault.
+// AzureKeyVaultFactory is the ProviderFactory for AzureKeyVault. It accepts the same arguments as AzureKeyVault.
 func AzureKeyVaultFactory(args ...interface{}) (Provider, error) {
 	if args == nil {
 		return NewAzureKeyVault(nil)
@@ -114,7 +113,7 @@ func (akv AzureKeyVault) GetCredentials(credID string) (*Credentials, error) {
 
 	resp, err := akv.client.GetSecret(context.TODO(), credID, "", nil)
 	if err != nil {
-		return nil, fmt.Errorf("while retrieving credentials with ID: %s from azure key vault: %s", credID, os.Getenv("AZURE_KEY_VAULT_URI"))
+		return nil, fmt.Errorf("while retrieving credentials with ID: %s from azure key vault: %s, %w", credID, os.Getenv("AZURE_KEY_VAULT_URI"), err)
 	}
 
 	credsJSON := *resp.Value

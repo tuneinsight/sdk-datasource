@@ -13,7 +13,7 @@ import (
 	"github.com/go-openapi/validate"
 )
 
-// DataSourceConsentType consent type given to the data source
+// DataSourceConsentType Consent type given to the data source.
 //
 // swagger:model dataSourceConsentType
 type DataSourceConsentType string

@@ -1,0 +1,21 @@
+definitions:
+  dataObjectId:
+    type: 'string'
+    pattern: '^[\w:-]+$'
+    description: 'Unique identifier of a data object.'
+  dataObjectSharedId:
+    type: 'string'
+    pattern: '^[\w:-]+$'
+    description: 'Shared identifier of a data object.'
+  dataSourceId:
+    type: 'string'
+    pattern: '^[\w:-]+$'
+    description: 'Unique identifier of a data source.'
+  dataSourceConsentType:
+    description: Consent type given to the data source.
+    type: string
+    enum:
+      - none 
+      - broad
+      - specific
+      - unknown
