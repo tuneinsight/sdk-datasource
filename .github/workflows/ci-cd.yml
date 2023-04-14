@@ -1,4 +1,4 @@
-name: Data Source SDK beautification
+name: Data Source SDK beautification and security scanning
 on:
   push:
   workflow_dispatch:
@@ -26,3 +26,8 @@ jobs:
 
       - name: Go sources beautification
         run: make go-imports go-lint
+    
+      - name: Run Gosec Security Scanner
+        uses: securego/gosec@master
+        with:
+          args: ./...
