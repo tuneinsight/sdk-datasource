@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/google/uuid"
+	"github.com/lib/pq"
 	"github.com/tuneinsight/sdk-datasource/pkg/models"
 	"github.com/tuneinsight/sdk-datasource/pkg/sdk/credentials"
 	"gorm.io/gorm"
@@ -25,7 +26,9 @@ type MetadataDB struct {
 	Type                    DataSourceType           `gorm:"not null"`
 	CredentialsProviderType credentials.ProviderType `gorm:"not null"`
 	Owner                   string                   `gorm:"not null"`
-	DeletedAt               gorm.DeletedAt           `gorm:"uniqueIndex:udx_name"`
+	AccessScope             string
+	AuthorizedUsers         pq.StringArray `gorm:"type:text[]"`
+	DeletedAt               gorm.DeletedAt `gorm:"uniqueIndex:udx_name"`
 }
 
 // TableName overrides the table name used by MetadataDB to `data_sources`
