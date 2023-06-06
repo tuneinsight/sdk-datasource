@@ -75,7 +75,12 @@ func (m *DBManager) Close(config DatabaseConfig) error {
 	if !ok {
 		return nil
 	}
-	return db.Close()
+	err := db.Close()
+	if err != nil {
+		return err
+	}
+	m.deleteDB(Checksum(config))
+	return nil
 }
 
 func (m *DBManager) addDB(cs int64, db *Database) {
@@ -89,6 +94,12 @@ func (m *DBManager) getDB(cs int64) (db *Database, ok bool) {
 	defer m.Unlock()
 	db, ok = m.databases[cs]
 	return
+}
+
+func (m *DBManager) deleteDB(cs int64) {
+	m.Lock()
+	defer m.Unlock()
+	delete(m.databases, cs)
 }
 
 // Checksum returns the checksum of a connection configuration which is created using the datasource name and the driver name
