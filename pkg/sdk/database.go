@@ -9,6 +9,14 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+type DatabaseError struct {
+	Err error
+}
+
+func (r *DatabaseError) Error() string {
+	return fmt.Sprintf("Database Error: err %v", r.Err)
+}
+
 // Database is composed of a *sql.DB, logger and Database configuration
 type Database struct {
 	DatabaseConfig
@@ -38,9 +46,10 @@ func NewDatabase(conf DatabaseConfig, connection *sql.DB, maxConnAttempts int, s
 		"db-driver": conf.DriverName(),
 		"db-name":   conf.Name(),
 	})
-	err = db.WaitReady()
+	// err = db.WaitReady()
+	err = db.Ping()
 	if err != nil {
-		return nil, fmt.Errorf("waiting for db: %w", err)
+		return nil, err
 	}
 	return db, nil
 }

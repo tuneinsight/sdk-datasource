@@ -37,7 +37,7 @@ func (m *DBManager) NewDatabase(config DatabaseConfig) (db *Database, err error)
 	}
 	db, err = NewDatabase(config, conn, m.MaxConnectionAttempts, time.Duration(m.SleepingTimeBetweenAttemptsSeconds)*time.Second)
 	if err != nil {
-		return nil, fmt.Errorf("creating database: %w", err)
+		return nil, &DatabaseError{Err: fmt.Errorf("creating database: %w", err)}
 	}
 	m.addDB(Checksum(config), db)
 	return db, nil
