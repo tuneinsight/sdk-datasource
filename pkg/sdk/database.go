@@ -9,10 +9,12 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+// DatabaseError is wraps a database-related error
 type DatabaseError struct {
 	Err error
 }
 
+// Error prints the error message related to database
 func (r *DatabaseError) Error() string {
 	return fmt.Sprintf("database error: %v", r.Err)
 }
