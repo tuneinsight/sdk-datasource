@@ -14,7 +14,7 @@ type DatabaseError struct {
 }
 
 func (r *DatabaseError) Error() string {
-	return fmt.Sprintf("Database Error: err %v", r.Err)
+	return fmt.Sprintf("database error: %v", r.Err)
 }
 
 // Database is composed of a *sql.DB, logger and Database configuration
@@ -46,10 +46,9 @@ func NewDatabase(conf DatabaseConfig, connection *sql.DB, maxConnAttempts int, s
 		"db-driver": conf.DriverName(),
 		"db-name":   conf.Name(),
 	})
-	// err = db.WaitReady()
-	err = db.Ping()
+	err = db.WaitReady()
 	if err != nil {
-		return nil, err
+		return nil, &DatabaseError{Err: err}
 	}
 	return db, nil
 }
@@ -124,7 +123,7 @@ func (db *Database) WaitReady() (err error) {
 		i++
 	}
 	if err != nil {
-		return fmt.Errorf("unable to connect to the DB %v: %w", db.Name(), err)
+		return fmt.Errorf("unable to connect to %v: %w", db.Name(), err)
 	}
 	return
 }
