@@ -9,6 +9,16 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+// DatabaseError is wraps a database-related error
+type DatabaseError struct {
+	Err error
+}
+
+// Error prints the error message related to database
+func (r *DatabaseError) Error() string {
+	return fmt.Sprintf("database error: %v", r.Err)
+}
+
 // Database is composed of a *sql.DB, logger and Database configuration
 type Database struct {
 	DatabaseConfig
@@ -40,7 +50,7 @@ func NewDatabase(conf DatabaseConfig, connection *sql.DB, maxConnAttempts int, s
 	})
 	err = db.WaitReady()
 	if err != nil {
-		return nil, fmt.Errorf("waiting for db: %w", err)
+		return nil, &DatabaseError{Err: err}
 	}
 	return db, nil
 }
@@ -115,7 +125,7 @@ func (db *Database) WaitReady() (err error) {
 		i++
 	}
 	if err != nil {
-		return fmt.Errorf("unable to connect to the DB %v: %w", db.Name(), err)
+		return fmt.Errorf("unable to connect to %v: %w", db.Name(), err)
 	}
 	return
 }
