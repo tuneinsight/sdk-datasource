@@ -2,10 +2,12 @@ package sdk
 
 import (
 	"database/sql"
+	"reflect"
 	"time"
 
 	"fmt"
 
+	"github.com/go-sql-driver/mysql"
 	"github.com/sirupsen/logrus"
 )
 
@@ -120,6 +122,12 @@ func (db *Database) Delete(sqlStatement string, args ...interface{}) (err error)
 func (db *Database) WaitReady() (err error) {
 	i := 0
 	for err = db.Ping(); err != nil && i < db.MaxConnectionAttempts; err = db.Ping() {
+		// Return directly if we encounter a MySQL error
+		if reflect.TypeOf(err) == reflect.TypeOf(&mysql.MySQLError{}) {
+			return err
+		}
+
+		// Otherwise, keep retrying (could be e.g. *net.OpError)
 		db.FieldLogger.Warn(fmt.Errorf("impossible to connect to DB: %v. trying again in: %v seconds, error: %w", db.Name(), db.SleepingTimeBetweenAttempts, err))
 		time.Sleep(db.SleepingTimeBetweenAttempts)
 		i++

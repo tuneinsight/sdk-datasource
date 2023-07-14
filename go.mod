@@ -9,6 +9,7 @@ require (
 	github.com/go-openapi/errors v0.20.3
 	github.com/go-openapi/strfmt v0.21.3
 	github.com/go-openapi/validate v0.22.1
+	github.com/go-sql-driver/mysql v1.7.1
 	github.com/google/uuid v1.3.0
 	github.com/sirupsen/logrus v1.9.0
 	go.opentelemetry.io/otel v1.14.0
