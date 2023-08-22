@@ -7,15 +7,15 @@ type APIConfig interface {
 	APIName() string
 	// GetURL should return URL of the API
 	GetURL() string
-	// GetTeleportCert should return the name of the Teleport certificate used for this datasource (if applicable, otherwise "")
-	GetTeleportCert() string
+	// GetCert should return the name of the certificate used for this datasource (if applicable, otherwise "")
+	GetCert() string
 }
 
 // GenericAPIConfig is the configuration for a generic HTTP API
 type GenericAPIConfig struct {
-	URL          string `yaml:"api-url" json:"api-url" default:"localhost"`
-	Token        string `yaml:"api-token" json:"api-token" default:""`
-	TeleportCert string `yaml:"teleport-cert" json:"teleport-cert" default:""`
+	URL   string `yaml:"api-url" json:"api-url" default:"localhost"`
+	Token string `yaml:"api-token" json:"api-token" default:""`
+	Cert  string `yaml:"cert" json:"cert" default:""`
 }
 
 // APIName returns the name of the API which is 'generic'
@@ -28,7 +28,7 @@ func (conf GenericAPIConfig) GetURL() string {
 	return conf.URL
 }
 
-// GetTeleportCert returns the name of the Teleport certificate used for this datasource (if applicable)
-func (conf GenericAPIConfig) GetTeleportCert() string {
-	return conf.TeleportCert
+// GetCert returns the name of the certificate used for this datasource (if applicable)
+func (conf GenericAPIConfig) GetCert() string {
+	return conf.Cert
 }
