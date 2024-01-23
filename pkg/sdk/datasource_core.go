@@ -54,18 +54,21 @@ func NewDataSourceCore(mdb *MetadataDB, mds *MetadataStorage, provider credentia
 	} else {
 		dsc.MetadataStorage = NewMetadataStorage(nil)
 	}
-
-	if provider == nil {
-		provider = credentials.NewLocal(nil)
-	}
 	dsc.CredentialsProvider = provider
 
 	if mdb != nil {
 		dsc.MetadataDB = mdb
 		// override any previously existing credentials provider type with the right one
-		dsc.MetadataDB.CredentialsProviderType = provider.Type()
+		if dsc.MetadataDB.CredentialsProviderType == "" && provider != nil {
+			dsc.MetadataDB.CredentialsProviderType = provider.Type()
+		}
+
 	} else {
-		dsc.MetadataDB = NewMetadataDB("", "", "", "", provider.Type())
+		var pt credentials.ProviderType
+		if provider != nil {
+			pt = provider.Type()
+		}
+		dsc.MetadataDB = NewMetadataDB("", "", "", "", pt)
 	}
 
 	return dsc
