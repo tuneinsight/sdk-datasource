@@ -13,6 +13,7 @@ import (
 // DataSourceCore contains the common DataSource metadata.
 // All DataSource implementations must embed DataSourceCore.
 type DataSourceCore struct {
+	CredentialsProvider credentials.Provider
 	*MetadataDB
 	*MetadataStorage
 	Ctx *context.Context // For telemetry
@@ -38,14 +39,14 @@ func (MetadataDB) TableName() string {
 
 // MetadataStorage contains the common DataSource metadata that are stored in the TI Note object storage.
 type MetadataStorage struct {
-	CredentialsProvider credentials.Provider
-	Attributes          []string
-	ConsentType         models.DataSourceConsentType
+	ProviderConfiguration map[string]string
+	Attributes            []string
+	ConsentType           models.DataSourceConsentType
 }
 
 // NewDataSourceCore instantiates a DataSourceCore with the provided @mdb and @mds.
 // If either @mdb or @mds are nil, they are set to default values.
-func NewDataSourceCore(mdb *MetadataDB, mds *MetadataStorage) *DataSourceCore {
+func NewDataSourceCore(mdb *MetadataDB, mds *MetadataStorage, provider credentials.Provider) *DataSourceCore {
 	dsc := new(DataSourceCore)
 
 	if mds != nil {
@@ -53,13 +54,21 @@ func NewDataSourceCore(mdb *MetadataDB, mds *MetadataStorage) *DataSourceCore {
 	} else {
 		dsc.MetadataStorage = NewMetadataStorage(nil)
 	}
+	dsc.CredentialsProvider = provider
 
 	if mdb != nil {
 		dsc.MetadataDB = mdb
 		// override any previously existing credentials provider type with the right one
-		dsc.MetadataDB.CredentialsProviderType = dsc.MetadataStorage.CredentialsProvider.Type()
+		if dsc.MetadataDB.CredentialsProviderType == "" && provider != nil {
+			dsc.MetadataDB.CredentialsProviderType = provider.Type()
+		}
+
 	} else {
-		dsc.MetadataDB = NewMetadataDB("", "", "", "", dsc.MetadataStorage.CredentialsProvider.Type())
+		var pt credentials.ProviderType
+		if provider != nil {
+			pt = provider.Type()
+		}
+		dsc.MetadataDB = NewMetadataDB("", "", "", "", pt)
 	}
 
 	return dsc
@@ -71,7 +80,7 @@ func NewDataSourceCore(mdb *MetadataDB, mds *MetadataStorage) *DataSourceCore {
 func NewMetadataDB(id models.DataSourceID, owner, name string, dsType DataSourceType, cpType credentials.ProviderType) *MetadataDB {
 	mdb := new(MetadataDB)
 	if id == "" {
-		mdb.ID = newDataSourceID()
+		mdb.ID = NewDataSourceID()
 	} else {
 		mdb.ID = id
 	}
@@ -84,15 +93,11 @@ func NewMetadataDB(id models.DataSourceID, owner, name string, dsType DataSource
 
 // NewMetadataStorage instantiates a default MetadataStorage.
 // If a nil @cp is passed, a default Local one is set.
-func NewMetadataStorage(cp credentials.Provider) *MetadataStorage {
+func NewMetadataStorage(providerConfig map[string]string) *MetadataStorage {
 	ms := new(MetadataStorage)
 	ms.Attributes = make([]string, 0)
 	ms.ConsentType = models.DataSourceConsentTypeUnknown
-	if cp != nil {
-		ms.CredentialsProvider = cp
-	} else {
-		ms.CredentialsProvider = credentials.NewLocal(nil)
-	}
+	ms.ProviderConfiguration = providerConfig
 	return ms
 }
 
@@ -119,7 +124,7 @@ func (dsc *DataSourceCore) GetContext() *context.Context {
 // BeforeCreate sets a new id to the DataSource if it is empty upon database insert.
 func (mdb *MetadataDB) BeforeCreate(tx *gorm.DB) (err error) {
 	if mdb.ID == "" {
-		mdb.ID = newDataSourceID()
+		mdb.ID = NewDataSourceID()
 	}
 	return
 }
@@ -148,7 +153,7 @@ func DataImpl(ds DataSource) map[string]interface{} {
 	return data
 }
 
-// newDataSourceID generates a new DataSource ID.
-func newDataSourceID() models.DataSourceID {
+// NewDataSourceID generates a new DataSource ID.
+func NewDataSourceID() models.DataSourceID {
 	return models.DataSourceID(uuid.New().String())
 }
